@@ -1,0 +1,18 @@
+{
+  "name": "@orbitchat/sdk",
+  "version": "1.0.0",
+  "description": "Synthetic OrbitChat v1 SDK fixture.",
+  "type": "module",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
+
