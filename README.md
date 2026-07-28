@@ -4,9 +4,11 @@ A small TypeScript customer application that uses the synthetic
 `@orbitchat/sdk` version `1.0.0`. It is suitable as an additional repository
 for exercising the Migration API's OrbitChat v1-to-v2 workflow.
 
-The OrbitChat package is intentionally local because the SDK described by the
-Migration API scenario is synthetic and is not published to npm. The local
-package implements the documented v1 `messages.send` contract.
+The application pins the published `@orbitchat/sdk` package to exactly
+`1.0.0`, making it a deterministic v1-to-v2 migration candidate. The published
+v1 package defines the `OrbitChatClient` contract; this project injects a
+client implementation at its application boundary and uses an in-memory
+implementation for the executable demo and tests.
 
 ## Requirements
 
@@ -35,4 +37,3 @@ credentials.
 
 The wrapper deliberately keeps an application-owned return contract so an SDK
 migration can change its implementation without changing downstream callers.
-

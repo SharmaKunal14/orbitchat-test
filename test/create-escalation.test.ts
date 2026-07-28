@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  createOrbitChatClient,
-  type MessageTransport,
+  type OrbitChatClient,
   type SendMessageInput
 } from "@orbitchat/sdk";
 import {
@@ -20,13 +19,15 @@ test("sends a direct OrbitChat escalation and records its v1 message id", async 
     };
   }> = [];
 
-  const transport: MessageTransport = {
-    async send(input) {
-      sent.push(input);
-      return {
-        message_id: "message-escalation",
-        created_at: "2026-07-28T00:00:00.000Z"
-      };
+  const client: OrbitChatClient = {
+    messages: {
+      async send(input) {
+        sent.push(input);
+        return {
+          message_id: "message-escalation",
+          created_at: "2026-07-28T00:00:00.000Z"
+        };
+      }
     }
   };
   const audit: AuditWriter = {
@@ -36,7 +37,7 @@ test("sends a direct OrbitChat escalation and records its v1 message id", async 
   };
 
   const messageId = await createEscalationMessage(
-    createOrbitChatClient({ transport }),
+    client,
     audit,
     {
       id: "escalation-42",
@@ -63,4 +64,3 @@ test("sends a direct OrbitChat escalation and records its v1 message id", async 
     }
   ]);
 });
-

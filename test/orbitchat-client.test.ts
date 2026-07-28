@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  createOrbitChatClient,
-  type MessageTransport,
+  type OrbitChatClient,
   type SendMessageInput
 } from "@orbitchat/sdk";
 import { createOrbitMessageService } from "../src/integrations/orbitchat-client.js";
@@ -12,19 +11,21 @@ function createHarness(): {
   readonly service: ReturnType<typeof createOrbitMessageService>;
 } {
   const sent: SendMessageInput[] = [];
-  const transport: MessageTransport = {
-    async send(input) {
-      sent.push(input);
-      return {
-        message_id: "message-123",
-        created_at: "2026-07-28T00:00:00.000Z"
-      };
+  const client: OrbitChatClient = {
+    messages: {
+      async send(input) {
+        sent.push(input);
+        return {
+          message_id: "message-123",
+          created_at: "2026-07-28T00:00:00.000Z"
+        };
+      }
     }
   };
 
   return {
     sent,
-    service: createOrbitMessageService(createOrbitChatClient({ transport }))
+    service: createOrbitMessageService(client)
   };
 }
 
@@ -85,4 +86,3 @@ test("rejects empty application input before calling the SDK transport", async (
   );
   assert.equal(sent.length, 0);
 });
-

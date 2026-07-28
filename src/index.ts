@@ -1,21 +1,21 @@
 import {
-  createOrbitChatClient,
   version,
-  type MessageTransport,
+  type OrbitChatClient,
   type SendMessageInput
 } from "@orbitchat/sdk";
 import { createOrbitMessageService } from "./integrations/orbitchat-client.js";
 
-const inMemoryTransport: MessageTransport = {
-  async send(input: SendMessageInput) {
-    return {
-      message_id: `message-${input.room}`,
-      created_at: new Date(0).toISOString()
-    };
+const orbit: OrbitChatClient = {
+  messages: {
+    async send(input: SendMessageInput) {
+      return {
+        message_id: `message-${input.room}`,
+        created_at: new Date(0).toISOString()
+      };
+    }
   }
 };
 
-const orbit = createOrbitChatClient({ transport: inMemoryTransport });
 const messages = createOrbitMessageService(orbit);
 
 const created = await messages.sendOrbitMessage({
@@ -30,4 +30,3 @@ console.log(
     message: created
   })
 );
-
