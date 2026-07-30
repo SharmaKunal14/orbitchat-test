@@ -1,15 +1,16 @@
 import {
   version,
-  type OrbitChatClient
+  type OrbitChatClient,
+  type SendMessageInput
 } from "@orbitchat/sdk";
 import { createOrbitMessageService } from "./integrations/orbitchat-client.js";
 
 const orbit: OrbitChatClient = {
   messages: {
-    async create(input) {
+    async send(input: SendMessageInput) {
       return {
-        id: `message-${input.channelId}`,
-        createdAt: new Date(0).toISOString()
+        message_id: `message-${input.room}`,
+        created_at: new Date(0).toISOString()
       };
     }
   }

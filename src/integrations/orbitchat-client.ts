@@ -24,17 +24,15 @@ export function createOrbitMessageService(client: OrbitChatClient): {
 } {
   return {
     async sendOrbitMessage(input) {
-      const result = await client.messages.create({
-        channelId: requireNonEmptyString(input.roomId, "roomId"),
-        content: requireNonEmptyString(input.body, "body"),
-        ...(input.notify === undefined
-          ? {}
-          : { notification: { enabled: input.notify } })
+      const result = await client.messages.send({
+        room: requireNonEmptyString(input.roomId, "roomId"),
+        text: requireNonEmptyString(input.body, "body"),
+        notify: input.notify
       });
 
       return {
-        id: result.id,
-        createdAt: result.createdAt
+        id: result.message_id,
+        createdAt: result.created_at
       };
     }
   };

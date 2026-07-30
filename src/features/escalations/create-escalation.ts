@@ -18,17 +18,17 @@ export async function createEscalationMessage(
   audit: AuditWriter,
   escalation: Escalation
 ): Promise<string> {
-  const created = await orbit.messages.create({
-    channelId: escalation.channelId,
-    content: `[${escalation.id}] ${escalation.summary}`,
-    notification: { enabled: true }
+  const created = await orbit.messages.send({
+    room: escalation.channelId,
+    text: `[${escalation.id}] ${escalation.summary}`,
+    notify: true
   });
 
   await audit.record("orbit_message_created", {
     escalationId: escalation.id,
-    externalId: created.id
+    externalId: created.message_id
   });
 
-  return created.id;
+  return created.message_id;
 }
 

@@ -1,22 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { OrbitChatClient } from "@orbitchat/sdk";
+import {
+  type OrbitChatClient,
+  type SendMessageInput
+} from "@orbitchat/sdk";
 import { createOrbitMessageService } from "../src/integrations/orbitchat-client.js";
 
-type CreateMessageInput = Parameters<OrbitChatClient["messages"]["create"]>[0];
-
 function createHarness(): {
-  readonly sent: CreateMessageInput[];
+  readonly sent: SendMessageInput[];
   readonly service: ReturnType<typeof createOrbitMessageService>;
 } {
-  const sent: CreateMessageInput[] = [];
+  const sent: SendMessageInput[] = [];
   const client: OrbitChatClient = {
     messages: {
-      async create(input) {
+      async send(input) {
         sent.push(input);
         return {
-          id: "message-123",
-          createdAt: "2026-07-28T00:00:00.000Z"
+          message_id: "message-123",
+          created_at: "2026-07-28T00:00:00.000Z"
         };
       }
     }
@@ -39,9 +40,9 @@ test("maps the application request and response", async () => {
 
   assert.deepEqual(sent, [
     {
-      channelId: "support",
-      content: "Customer needs help",
-      notification: { enabled: true }
+      room: "support",
+      text: "Customer needs help",
+      notify: true
     }
   ]);
   assert.deepEqual(result, {
@@ -59,10 +60,10 @@ test("preserves an explicit false notification value", async () => {
     notify: false
   });
 
-  assert.equal(sent[0]?.notification?.enabled, false);
+  assert.equal(sent[0]?.notify, false);
 });
 
-test("omits notification when the application value is omitted", async () => {
+test("passes an omitted notification value as undefined", async () => {
   const { sent, service } = createHarness();
 
   await service.sendOrbitMessage({
@@ -70,7 +71,7 @@ test("omits notification when the application value is omitted", async () => {
     body: "Daily digest"
   });
 
-  assert.equal(Object.hasOwn(sent[0]!, "notification"), false);
+  assert.equal(sent[0]?.notify, undefined);
 });
 
 test("rejects empty application input before calling the SDK transport", async () => {
