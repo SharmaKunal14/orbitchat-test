@@ -1,16 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  type OrbitChatClient,
-  type SendMessageInput
-} from "@orbitchat/sdk";
+import type { OrbitChatClient } from "@orbitchat/sdk";
 import {
   createEscalationMessage,
   type AuditWriter
 } from "../src/features/escalations/create-escalation.js";
 
-test("sends a direct OrbitChat escalation and records its v1 message id", async () => {
-  const sent: SendMessageInput[] = [];
+type CreateMessageInput = Parameters<
+  OrbitChatClient["messages"]["create"]
+>[0];
+
+test("sends a direct OrbitChat escalation and records its message id", async () => {
+  const sent: CreateMessageInput[] = [];
   const audits: Array<{
     readonly event: string;
     readonly attributes: {
@@ -21,11 +22,11 @@ test("sends a direct OrbitChat escalation and records its v1 message id", async 
 
   const client: OrbitChatClient = {
     messages: {
-      async send(input) {
+      async create(input) {
         sent.push(input);
         return {
-          message_id: "message-escalation",
-          created_at: "2026-07-28T00:00:00.000Z"
+          id: "message-escalation",
+          createdAt: "2026-07-28T00:00:00.000Z"
         };
       }
     }
@@ -49,9 +50,9 @@ test("sends a direct OrbitChat escalation and records its v1 message id", async 
   assert.equal(messageId, "message-escalation");
   assert.deepEqual(sent, [
     {
-      room: "urgent-support",
-      text: "[escalation-42] Customer cannot sign in",
-      notify: true
+      channelId: "urgent-support",
+      content: "[escalation-42] Customer cannot sign in",
+      notification: { enabled: true }
     }
   ]);
   assert.deepEqual(audits, [
